@@ -8,7 +8,7 @@ Developed as part of the research project *"Diseño y desarrollo de software ori
 
 ## Overview
 
-Famous Curves is a set of real-time curve generators written in **JSFX**, designed to be dropped directly into REAPER. Each plugin computes, sample by sample, the X/Y coordinates of a point moving along a well-known mathematical curve (circles, Lissajous figures, spirographs, polar roses, spirals, and more), normalized to the **[-1, 1]** range on both axes.
+Famous Curves is a set of real-time curve generators written in **JSFX**, designed to be dropped directly into REAPER. Each plugin computes, by blocks of samples, the X/Y coordinates of a point moving along a well-known mathematical curve (circles, Lissajous figures, spirographs, polar roses, spirals, and more), normalized to the **[-1, 1]** range on both axes.
 
 These coordinates can be used to:
 - Drive the position of a virtual sound source in a **spatializer/panner** plugin.
