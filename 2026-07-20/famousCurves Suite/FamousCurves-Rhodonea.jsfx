@@ -1,0 +1,61 @@
+desc:Famous Curves - Rhodonea 2026-06-23
+
+import dependencies/FamousCurves.jsfx-inc
+
+slider1:0.5<0,5,0.0001:log=1>Frequency
+slider2:1<0,1,0.01>Amplitude
+slider3:0<0,360,0.01>Phase Offset(°)
+slider4:0<0,360,0.1>Rotation(°)
+slider5:0<-1,1,0.001>-Offset X 
+slider6:0<-1,1,0.001>-Offset Y
+slider7:0<0,1,1{Right, Left}>-Sense
+slider8:0<0,1,1{Limit, Wrap}>-Wrap
+slider9:0<0,3,1{Play A,Play B,Pause,Stop}>-State
+slider10:-0.1<-1,0,0.001>Alpha
+slider11:0<-1,1,0.001>-X (readout)
+slider12:0<-1,1,0.001>-Y (readout)
+slider13:2<0,20,0.1>k
+slider14:0<0,360,0.01>Petals (result)
+
+@init
+function gcd(a, b) (
+  while (b > 0) (
+    temp = b;
+    b = a % b;
+    a = temp;
+  );
+  a;
+);
+
+famousCurves.initialize();
+lastPetals = slider13;
+denominator = 10000;
+@slider
+famousCurves.updateSharedParameters();
+numerator = floor(slider13 * denominator + 0.5);
+slider13 != lastPetals ? (
+  famousCurves.phase = 0;
+  lastPetals = slider13;
+);
+gcd = gcd(numerator, denominator);
+p = numerator / gcd;
+q = denominator / gcd;
+phaseMultiplier = ((p*q) % 2 == 0) ? 2*q : q;
+k = slider13;
+famousCurves.increment /= phaseMultiplier * sqrt(1 + k*k);
+
+
+slider14 = ((p*q) % 2 == 0) ? 2*p : p;
+
+@block
+phase  = famousCurves.phase * phaseMultiplier + famousCurves.phaseOffset;
+
+radius = famousCurves.amplitude * cos(k * phase);
+famousCurves.x = radius * sin(phase);
+famousCurves.y = radius * cos(phase);
+  
+famousCurves.process();
+
+@gfx 320 320
+famousCurves.graph.render();
+
