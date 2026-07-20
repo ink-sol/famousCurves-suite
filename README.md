@@ -85,4 +85,4 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 ## Credits
 
-Developed at the Escuela de Música, Facultad de Humanidades y Artes, Universidad Nacional de Rosario (UNR), Argentina.
+Developed by Iñaki Solá during 2025-2026 at the Escuela de Música, Facultad de Humanidades y Artes, Universidad Nacional de Rosario (UNR), Argentina.
