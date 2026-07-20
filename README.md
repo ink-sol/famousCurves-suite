@@ -40,7 +40,7 @@ Each plugin includes a built-in **real-time graphical display** so you can previ
 
 ## Requirements
 
-- [REAPER](https://www.reaper.fm/) (any recent version supporting JSFX).
+- [REAPER](https://www.reaper.fm/) 
 - A spatializer/panner plugin capable of parameter modulation or MIDI/FX parameter linking (e.g. REAPER's built-in JS spatializers or any third-party panner).
 
 ## Installation
