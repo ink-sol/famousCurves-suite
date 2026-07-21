@@ -1,0 +1,108 @@
+desc:Famous Curves 2026-06-20
+
+import FamousCurves-Graph.jsfx-inc
+
+@init
+
+function initialize()
+  global()
+  local()
+  instance(twoPi, phase, phaseLimit, graph)
+( 
+  twoPi = 2*$pi;
+ 
+  phase = 0;
+  phaseLimit = twoPi;
+
+  graph.initialized = 0;
+  graph.coordinatesArray = 0;
+  graph.coordinatesArrayIndex = 0;
+
+  graph.width = 320;
+  graph.height = 320;
+  graph.squareCenter = min(graph.width,graph.height) * 0.5;
+  graph.margin = 10;
+  
+  graph.suspendAlpha = 0;
+);
+
+function updateSharedParameters()
+  global(slider1, slider2, slider3, slider4, slider5, slider6, slider7, slider8, slider10, srate)
+  local(rotation)
+  instance(twoPi, frequency, amplitude, phaseOffset, offsetX, offsetY, sense, wrap, increment, graph, cosineRotation, sineRotation)
+(
+  frequency = slider1;
+  amplitude = slider2;
+  phaseOffset = slider3 * twoPi / 360;
+  rotation = twoPi * slider4 / 360;
+  offsetX = slider5;
+  offsetY = slider6;
+  sense = slider7 ? -1 : 1;
+  wrap = slider8;
+  increment = twoPi * frequency * sense / srate;
+  graph.alpha = slider10;
+  cosineRotation = cos(rotation);
+  sineRotation = sin(rotation);
+);
+
+
+function wrap()
+  global()
+  local()
+  instance(wrap, x, y)
+(
+  wrap ? (
+    x > 1  ? x -= 2 : x < -1 ? x += 2;
+    y > 1  ? y -= 2 : y < -1 ? y += 2;
+    ) : (
+    x = min(1, max(-1, x));
+    y = min(1, max(-1, y));
+  );
+);
+
+function rotateAndOffset()
+  global()
+  local(x0, y0)
+  instance(x, y, offsetX, offsetY, cosineRotation, sineRotation)
+(
+  x0 = x;
+  y0 = y;
+  x = x0 * cosineRotation - y0 * sineRotation + offsetX; 
+  y = x0 * sineRotation + y0 * cosineRotation + offsetY;
+);
+
+function phaseTransport()
+  global(slider9, samplesblock)
+  local()
+  instance(transport, phase, increment, twoPi, phaseLimit)
+(
+  transport != slider9 ? (
+    slider9 < 2 && transport != 2  || slider9 == 3 ? phase = 0;
+    transport = slider9;
+  );
+  
+  transport < 2 ? ( 
+    phase += increment * samplesblock;
+    phase >= phaseLimit ? phase -= phaseLimit : phase < 0 ? phase += phaseLimit;
+  );
+);
+
+
+function process()
+  global(slider11, slider12)
+  local()
+  instance(graph, x, y)
+(
+  this.rotateAndOffset();
+  this.wrap();
+  graph.setXY(x,y);
+
+  slider11 = x;
+  slider12 = y;
+  slider_automate(slider11); 
+  slider_automate(slider12);
+
+  this.phaseTransport();
+
+);
+

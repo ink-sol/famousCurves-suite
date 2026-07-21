@@ -1,0 +1,53 @@
+desc:Curvas Notables - Input Events 2026-06-20
+
+@init
+function handleDrag()
+  global(gfx_dest, gfx_r, gfx_g, gfx_b, gfx_a, mouse_cap, mouse_x, mouse_y, gfx_w, gfx_h, gfx_x, gfx_y, slider5, slider6)
+  instance(margin, scale, suspendAlpha)
+  local(screenCenter, screenMargin, curveCenterX, curveCenterY)
+(
+  
+  (mouse_cap & 1) && (mouse_cap & 8) ? (
+    screenCenter = min(gfx_w, gfx_h) * 0.5;
+    screenMargin = margin * scale;
+    curveCenterX = (mouse_x - screenCenter) / (screenCenter - screenMargin);
+    curveCenterY = (screenCenter - mouse_y) / (screenCenter - screenMargin);
+    curveCenterX = min(1, max(-1, curveCenterX));
+    curveCenterY = min(1, max(-1, curveCenterY));
+  
+    slider5 =  curveCenterX;
+    slider6 =  curveCenterY;
+    slider_automate(slider5);
+    slider_automate(slider6);
+    
+    this..offsetX = slider5;
+    this..offsetY = slider6;
+    
+    gfx_dest = -1;
+    gfx_r = 1; gfx_g = 1; gfx_b = 0; gfx_a = 1;
+    gfx_x = 20; gfx_y = 20;
+    gfx_printf("X: %.3f", curveCenterX);
+    gfx_x = 20; gfx_y = 38;
+    gfx_printf("Y: %.3f", curveCenterY);
+    suspendAlpha = 1;
+  );  
+
+);
+
+function handleScroll()
+  global(mouse_cap, mouse_wheel, slider2)
+  local(mouseWheelDelta)
+  instance(mouseWheel, suspendAlpha)
+(
+  mouse_wheel != mouseWheel ? (  
+    mouseWheelDelta = mouseWheel - mouse_wheel;
+    mouseWheelDelta *= 0.0001;
+    slider2 -= mouseWheelDelta;
+    slider2 = min(1, max(0, slider2)); 
+    slider_automate(slider2);
+    this..amplitude = slider2;
+    mouseWheel = mouse_wheel;
+    suspendAlpha = 1;
+  );
+);
+
