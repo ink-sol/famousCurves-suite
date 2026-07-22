@@ -1,6 +1,7 @@
 # Famous Curves — JSFX Plugin Suite
 
 **A JSFX plugin suite for generating famous curves as spatial trajectories, built for music composition and electroacoustic music production in REAPER.**
+Latest Release: [![GitHub release](https://img.shields.io/github/v/release/ink-sol/FamousCurves-Suite)](https://github.com/ink-sol/FamousCurves-Suite/releases)
 
 Developed as part of the research project *"Diseño y desarrollo de software orientado a la generación de curvas notables para su uso en la producción y enseñanza de música electroacústica"*, carried out at the Escuela de Música, Facultad de Humanidades y Artes, Universidad Nacional de Rosario (UNR), under the CIN's *Becas Estímulo a las Vocaciones Científicas 2024* program.
 
