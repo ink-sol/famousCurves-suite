@@ -1,0 +1,98 @@
+desc:Famous Curves - Spirals
+author: ink-sol
+version: 0.1
+
+import dependencies/FamousCurves.jsfx-inc
+
+slider1:0.5<0,5,0.0001:log=1>Frequency
+slider2:1<0,1,0.01>Amplitude
+slider3:0<0,360,0.01>Phase Offset(°)
+slider4:0<0,360,0.1>Rotation(°)
+slider5:0<-1,1,0.001>-Offset X 
+slider6:0<-1,1,0.001>-Offset Y
+slider7:0<0,1,1{Right, Left}>-Sense
+slider8:0<0,1,1{Limit, Wrap}>-Wrap
+slider9:0<0,3,1{Play A,Play B,Pause,Stop}>-State
+slider10:-0.1<-1,0,0.001>Alpha
+slider11:0<-1,1,0.001>-X (readout)
+slider12:0<-1,1,0.001>-Y (readout)
+slider13:0<0,10,1{Archimedes,Hyperbolic,Logarithmic,Lituus,Fermat,Cochleoid,Poinsot Sechx,Poinsot Cosech,Epispiral,Sinusoidal +, Sinusoidal -}>Type
+slider14:1<0,20,0.01>Turns
+slider15:0.1<0,1,0.01>Shape(b)
+
+@init
+famousCurves.initialize();
+
+@slider
+famousCurves.updateSharedParameters();
+turns = slider14;
+turnsTwoPi = turns * famousCurves.twoPi;
+famousCurves.increment /= turns;
+slider13 == 6 || slider13 == 7 ? (
+  a = slider15;
+  b = (1-a);
+  phaseOffset = -famousCurves.twoPi * turns;
+  famousCurves.phaseLimit = famousCurves.twoPi * turns * 2;
+) :
+slider13 == 8 ? (
+  a = slider15 * 2 - 1;
+  b = (1-a);
+  phaseOffset = -famousCurves.twoPi * turns;
+  famousCurves.phaseLimit = famousCurves.twoPi * turns * 2;
+) : 
+slider13 >= 9 ? (
+  a = slider15;
+  b = (1-a) * turns;
+  c = slider13 == 9 ? turns : -turns;
+  turns = 1;
+  phaseOffset = -famousCurves.twoPi;
+  famousCurves.phaseLimit = famousCurves.twoPi * 2;
+) : (
+  a = slider15;
+  b = (1-a);
+  slider13 == 0 || slider13 == 4 ? b /= turnsTwoPi;
+  phaseOffset = 0;
+  famousCurves.phaseLimit = famousCurves.twoPi;
+);
+@block
+phaseTurns = (famousCurves.phase * turns + famousCurves.phaseOffset) + phaseOffset;
+slider13 < 1 ? ( // ARCHIMEDES
+  radius = (a + b * phaseTurns);
+) :
+slider13 == 1 ? ( // HYPERBOLIC
+  radius = 1 / (a + b * phaseTurns);
+) :
+slider13 == 2 ? ( // LOG
+  radius = exp(a + b*phaseTurns)/exp(a + b*turnsTwoPi);
+) :
+slider13 == 3 ? ( // LITUUS
+  radius = (a + b * phaseTurns)^(-1/2);
+) :
+slider13 == 4 ? ( // FERMAT
+  radius = sqrt(a + b * phaseTurns);
+) :
+slider13 == 5 ? ( // COCHLEOID
+  radius = sin(asin(a)+b*phaseTurns)/(a+b*phaseTurns);
+) :
+slider13 == 6 ? ( // POINSOT SECHX
+  phaseTurnsShape = b*phaseTurns;
+  radius = 2 / (exp(phaseTurnsShape) + exp(-phaseTurnsShape));
+) :
+slider13 == 7 ? ( // POINSOT COSECH
+  phaseTurnsShape = b*phaseTurns;
+  phaseTurnsShape = phaseTurnsShape >= 0 ? max(phaseTurnsShape, 0.000001) : min(phaseTurnsShape, -0.000001);
+  radius = 2 / (exp(phaseTurnsShape) - exp(-phaseTurnsShape));
+) :
+slider13 == 8 ? ( // EPISPIRAL
+  radius = 1 / cos(acos(a) + b * phaseTurns);
+) :
+slider13 >= 9 ? ( // SINUSOIDAL
+  radius = pow(cos(a + b * phaseTurns),1/c);
+);
+radius *= famousCurves.amplitude;
+famousCurves.x = radius * sin(phaseTurns);
+famousCurves.y = radius * cos(phaseTurns);
+famousCurves.process();
+@gfx 320 320
+famousCurves.graph.render();
+

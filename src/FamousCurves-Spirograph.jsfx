@@ -1,0 +1,70 @@
+desc:Famous Curves - Spirograph
+author: ink-sol
+version: 0.1
+
+import dependencies/FamousCurves.jsfx-inc
+
+slider1:0.5<0,5,0.0001:log=1>Frequency
+slider2:1<0,1,0.01>Amplitude
+slider3:0<0,360,0.01>Phase Offset(°)
+slider4:0<0,360,0.1>Rotation(°)
+slider5:0<-1,1,0.001>-Offset X 
+slider6:0<-1,1,0.001>-Offset Y
+slider7:0<0,1,1{Right, Left}>-Sense
+slider8:0<0,1,1{Limit, Wrap}>-Wrap
+slider9:0<0,3,1{Play A,Play B,Pause,Stop}>-State
+slider10:-0.1<-1,0,0.001>Alpha
+slider11:0<-1,1,0.001>-X (readout)
+slider12:0<-1,1,0.001>-Y (readout)
+slider13:0<0,1,1{Hypotrochoid,Epitrochoid}>Type
+slider14:0.56<0,1,0.001>Radius Ratio r/R
+slider15:1<0,15,0.001:log=1>Distance Ratio d/r
+
+@init
+function gcd(a, b) (
+  while (b > 0) (
+    temp = b;
+    b = a % b;
+    a = temp;
+  );
+  a;
+);
+
+famousCurves.initialize();
+fixedRadius = 10000;
+lastRollingRadius = slider14;
+
+@slider
+famousCurves.updateSharedParameters();
+//slider14 != rollingRadius ? famousCurves.graph.suspendAlpha = 1;
+rollingRadius = floor(slider14 * fixedRadius + 0.5);
+slider14 != lastRollingRadius ? (
+  famousCurves.phase = 0;
+  lastRollingRadius = slider14;
+);
+phaseMultiplier = rollingRadius / gcd(fixedRadius, rollingRadius);
+famousCurves.increment /= phaseMultiplier;
+deltaRadius = slider13 ? fixedRadius + rollingRadius : fixedRadius - rollingRadius;
+k = deltaRadius / rollingRadius;
+distance = rollingRadius * slider15; 
+// distance *= k -> maintain distance from center.
+scalingFactor = deltaradius + distance;
+
+@block
+phase  = famousCurves.phase * phaseMultiplier + famousCurves.phaseOffset;
+phaseK = k * phase;
+slider13 ? (
+  famousCurves.x = (deltaRadius * sin(phase) - distance * sin(phaseK)) / scalingFactor;
+  famousCurves.y = (deltaRadius * cos(phase) - distance * cos(phaseK)) / scalingFactor;
+) : (
+  famousCurves.x = (deltaRadius * sin(phase) - distance * sin(phaseK)) / scalingFactor;
+  famousCurves.y = (deltaRadius * cos(phase) + distance * cos(phaseK)) / scalingFactor;
+);
+famousCurves.x *= famousCurves.amplitude;
+famousCurves.y *= famousCurves.amplitude;
+  
+famousCurves.process();
+
+@gfx 320 320
+famousCurves.graph.render();
+

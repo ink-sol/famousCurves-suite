@@ -1,0 +1,194 @@
+desc:Famous Curves - Graph
+
+
+import FamousCurves-InputEvents.jsfx-inc
+
+@init
+function initializeGraph()
+  global(gfx_dest, gfx_mode, gfx_clear, gfx_r, gfx_g, gfx_b, gfx_a, gfx_x, gfx_y)
+  local()
+  instance(width, height, squareCenter)
+( 
+  gfx_setimgdim(0, -1, -1);
+  gfx_setimgdim(1, -1, -1);
+
+  gfx_setimgdim(0, width, height); 
+  gfx_dest = 0 ;
+  gfx_mode = 1;
+  gfx_clear = -1;
+
+  gfx_r = gfx_g = gfx_b = 0.3;
+  gfx_rect(squareCenter - 1, 0, 2, height, 0);
+  gfx_rect(0, squareCenter - 1, width, 2, 0);
+
+  gfx_r = 1; gfx_g = 0; gfx_b = 0;
+  gfx_rect(8, 8, width - 16, height - 16, 0);
+  
+  gfx_setimgdim(1, width, height);
+  
+ 
+);
+
+function setXY(x, y)
+  global()
+  local()
+  instance(coordinatesArray, coordinatesArrayIndex)
+(
+  coordinatesArray[coordinatesArrayIndex] = x;
+  coordinatesArray[coordinatesArrayIndex + 1] = y;
+  coordinatesArrayIndex += 2;
+);
+
+
+function drawCurve(alpha)
+  global(gfx_h, gfx_w, gfx_dest, gfx_mode, gfx_clear, gfx_r, gfx_g, gfx_b, gfx_a, gfx_x, gfx_y)
+  local(indexTmp, x, y, scale)
+  instance(initialized, coordinatesArray, coordinatesArrayIndex, width, height, squareCenter, margin, suspendAlpha)
+(
+
+  (!initialized) ? (
+    this.initializeGraph();
+    initialized = 1;
+  );
+
+  gfx_dest = 1;
+
+  gfx_mode = 1;        
+
+  suspendAlpha ?  (
+    gfx_a = -1;
+    suspendAlpha = 0;
+  ) : (
+    gfx_a = alpha; 
+  );
+
+  gfx_r = gfx_g = gfx_b = 0;
+  gfx_rect(0, 0, width, height);
+
+  gfx_mode = 1;       
+  gfx_a = 1;
+
+  gfx_r = gfx_g = gfx_b = 1;
+  indexTmp = 0;
+
+  while (indexTmp < coordinatesArrayIndex) (
+    x = (coordinatesArray[indexTmp] * (squareCenter - margin)) + squareCenter;
+    y = height - ((coordinatesArray[indexTmp+1] * (squareCenter - margin)) + squareCenter);
+
+    gfx_rect(x - 1, y - 1, 2, 2);
+
+    indexTmp += 2;
+  );
+
+  coordinatesArrayIndex = 0;
+
+  gfx_dest = -1;
+
+  scale = min(gfx_h, gfx_w) / 320;
+  gfx_x = 0; gfx_y = 0; 
+  gfx_blit(0, scale, 0);
+  gfx_x = 0; gfx_y = 0; 
+  gfx_blit(1, scale, 0);
+);
+
+function drawButton(buttonY, label, isActive)
+  global(gfx_r, gfx_g, gfx_b, gfx_x, gfx_y, gfx_w, gfx_h, mouse_cap, mouse_x, mouse_y)
+  instance(previousMouseCap, squareSize)
+  local(clicked)
+(
+    clicked = (mouse_cap & 1) &&
+              !(previousMouseCap & 1) &&
+              mouse_x >= squareSize &&
+              mouse_x <= squareSize + 80 &&
+              mouse_y >= buttonY &&
+              mouse_y <= buttonY + 18;
+
+    gfx_r = 0.2; gfx_g = isActive ? 0.5 : 0.2; gfx_b = 0.2;
+    gfx_rect(squareSize, buttonY, 80, 18);
+    gfx_r = 0.8; gfx_g = 0.8; gfx_b = 0.8;
+    gfx_x = squareSize + 4; gfx_y = buttonY + 3;
+    gfx_drawstr(label);
+
+    clicked;
+);
+
+function drawButtons()
+  global(gfx_dest, gfx_a, gfx_h, gfx_w, mouse_cap, slider5, slider6, slider7, slider8, slider9)
+  local()
+  instance(buttons, squareSize)
+(
+  gfx_dest = -1;
+  gfx_a = 1;
+  squareSize = min(gfx_h, gfx_w);
+  buttons.squareSize = squareSize;
+
+  buttons.drawButton(10, slider9 == 0 ? "Play A" : slider9 == 1 ? "Play B" : "Play A/B", slider9 < 2) ? (
+    slider9 = slider9 == 1 ? 0 : 1;
+    slider_automate(slider9);
+  );
+
+  buttons.drawButton(30, "Pause", slider9 == 2) ? (  
+    slider9 = 2;
+    slider_automate(slider9);
+  );
+
+  buttons.drawButton(50, "Stop", slider9 == 3) ? (  
+    slider9 = 3;
+    slider_automate(slider9);
+  );
+
+  buttons.drawButton(70, "Reset", 0) ? (
+    slider5 =  0;
+    slider6 =  0;
+    slider_automate(slider5);
+    slider_automate(slider6);
+    this..offsetX = slider5;
+    this..offsetY = slider6;
+  );
+    
+  buttons.drawButton(130, slider7 == 0 ? "Right" : "Left", 0) ? (
+    slider7 = slider7 == 1 ? 0 : 1;
+    slider_automate(slider7);
+    this..increment *= -1;
+  );    
+
+  buttons.drawButton(110, slider8 == 0 ? "Limit" : "Wrap", 0) ? (
+    slider8 = slider8 == 1 ? 0 : 1;
+    slider_automate(slider8);
+    this..wrap = slider8;
+  );
+
+  buttons.previousMouseCap = mouse_cap;
+);
+
+function drawStrings()
+  global(gfx_dest, gfx_r, gfx_g, gfx_b, gfx_a, gfx_x, gfx_y, gfx_w, gfx_h)
+  local(stringWide, stringHeight)
+( 
+  gfx_dest = -1;
+  gfx_r = 1; gfx_g = 1; gfx_b = 0; gfx_a = 0.7;
+
+  gfx_measurestr("Shift+Drag: mover centro", stringWide, stringHeight);
+  gfx_x = gfx_w - stringWide - 5;
+  gfx_y = gfx_h - stringHeight * 2 - 10;
+  gfx_drawstr("Shift+Drag: mover centro");
+
+  gfx_measurestr("Rueda: zoom radio", stringWide, stringHeight);
+  gfx_x = gfx_w - stringWide - 5;
+  gfx_y = gfx_h - stringHeight - 5;
+  gfx_drawstr("Rueda: zoom radio");
+);
+
+function render()
+  global(gfx_clear)
+  local()
+  instance(alpha)
+(
+    gfx_clear = 0;
+    this.handleDrag();
+    this.handleScroll();
+    this.setXY(this..offsetX,this..offsetY); // REVISAR
+    this.drawCurve(alpha);
+    this.drawButtons();
+    this.drawStrings()
+);

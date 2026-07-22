@@ -1,0 +1,35 @@
+desc:Famous Curves - Circumference/Ellipse
+author: ink-sol
+version: 0.1
+
+import dependencies/FamousCurves.jsfx-inc
+
+slider1:0.5<0,5,0.0001:log=1>Frequency
+slider2:1<0,1,0.01>Amplitude
+slider3:0<0,360,0.01>Phase Offset(°)
+slider4:0<0,360,0.1>Rotation(°)
+slider5:0<-1,1,0.001>-Offset X 
+slider6:0<-1,1,0.001>-Offset Y
+slider7:0<0,1,1{Right, Left}>-Sense
+slider8:0<0,1,1{Limit, Wrap}>-Wrap
+slider9:0<0,3,1{Play A,Play B,Pause,Stop}>-State
+slider10:-0.1<-1,0,0.001>Alpha
+slider11:0<-1,1,0.001>-X (readout)
+slider12:0<-1,1,0.001>-Y (readout)
+slider13:1<0,1,0.01:log=1>Amplitude Ratio
+
+@init
+famousCurves.initialize();
+
+@slider
+famousCurves.updateSharedParameters();
+amplitudeX = slider2;
+amplitudeY = amplitudeX * slider13;
+@block
+famousCurves.x = amplitudeX * sin(famousCurves.phase + famousCurves.phaseOffset); 
+famousCurves.y = amplitudeY * cos(famousCurves.phase + famousCurves.phaseOffset);
+famousCurves.process();
+
+@gfx 320 320
+famousCurves.graph.render();
+
